@@ -7,60 +7,44 @@ import static utils.ArrayUtils.printArray;
 class Solution {
 
     public static void main(String[] args) {
-        //给定一个数组 nums，编写一个函数将所有 0 移动到数组的末尾，同时保持非零元素的相对顺序。
-        //
-        //请注意 ，必须在不复制数组的情况下原地对数组进行操作。
-        //
-        //
-        //
-        //示例 1:
-        //
-        //输入: nums = [0,1,0,3,12]
-        //输出: [1,3,12,0,0]
-
-
         // 有一个数组nums
-        // 将nums中的0移动到末尾，但是不能改变数组中元素的原有位置
+        // 返回其中的多数元素。多数元素是指在数组中出现次数 大于 ⌊ n/2 ⌋ 的元素。
+        // 你可以假设数组是非空的，并且给定的数组总是存在多数元素。
         // 例如
-        int[] nums = new int[]{0, 1, 0, 3, 12}; // [2,1]
+        int[] nums = new int[]{3, 2, 3};
         // 结果：
-        // [1,3,12,0,0]
-        printArray(nums);
-
-        moveZeroes(nums);
-
-        printArray(nums);
+        // 3
+        int result = majorityElement(nums);
+        System.out.println(result);
     }
 
 
-    public static void moveZeroes(int[] nums) {
-        // 0, 1, 0, 3, 12 - s=0;f=1
-        // 1, 0, 0, 3, 12 - s=1;f=2
-        // 1, 0, 0, 3, 12 - s=1;f=3
-        // 1, 3, 0, 0, 12 - s=2;f=4
-        // 1, 3, 12, 0, 0 - s=3;f=5
-        // return
+    //  提示1：想象一个场景——一群人互相"对拼消耗"，一个人可以"消灭"一个不同阵营的人，最后活下来的是哪个阵营？
+    //  提示2：只需要两个变量：候选人 和 票数。
+    public static int majorityElement(int[] nums) {
+        // 候选人，票数
+        int c = 0;
+        int t = 0;
 
+        // 不同人参选票数抵消，多票数的候选人最后会留存下来
+        for (int i = 0; i < nums.length; i++) {
 
-        // 双指针
-
-        // 慢指针：指向当前需保留元素位置
-        int s = 0;
-
-        // 快指针：指向扫描位置
-        for (int f = 1; f < nums.length; f++) {
-            // 快指针不为0，慢指针为0
-            if (nums[f] != 0) {
-                int tmp = nums[s]; // [2,1]
-                // 和慢指针替换
-                nums[s] = nums[f];
-                nums[f] = tmp;
-                // 慢指针右移
-                s++;
+            // 如果票数为0，则当前人候选
+            if (t == 0) {
+                c = nums[i];
             }
 
-
-            // 每次循环快指针都右移，直到底部
+            // 票数抵消
+            if (c == nums[i]) {
+                // 参选人等于候选人，票数+1
+                t++;
+            } else {
+                // 其他参选人，票数-1
+                t--;
+            }
         }
+
+        // 最后获胜的返回
+        return c;
     }
 }
