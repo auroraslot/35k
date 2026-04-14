@@ -984,7 +984,10 @@
 
                     // 解析表格数据行
                     if (isInTable && line.includes('|') && !line.includes('---') && !line.includes('题号')) {
-                        const parts = line.split('|').map(part => part.trim()).filter(part => part);
+                        const parts = line.split('|').map(part => part.trim());
+                        // 移除开头和结尾的空部分（表格边框）
+                        if (parts.length > 0 && parts[0] === '') parts.shift();
+                        if (parts.length > 0 && parts[parts.length - 1] === '') parts.pop();
                         if (parts.length >= 5) {
                             const number = parseInt(parts[0]);
 
