@@ -3,69 +3,78 @@ import java.util.*;
 class Solution {
 
     public static void main(String[] args) {
-        // 有两个非递减的数组nums1和nums2
-        // 请合并nums2到nums1，使合并后的数组保持非递减排序
-        // nums1的有效元素为m，nums2的有效元素为n。m + n = nums1.length
+        // 有一个数组nums
+        // 找出其中具有最大和的连续子数组（至少一个元素），并返回其子数组的最大和
         // 例如
-        int[] nums1 = new int[]{1, 2, 3, 0, 0, 0};
-        int m = 3;
-        int[] nums2 = new int[]{2, 5, 6};
-        int n = 3;
+        int[] nums = new int[]{-2, 1, -3, 4, -1, 2, 1, -5, 4};
         // 结果：
-        // nums1=[1, 2, 2, 3, 5, 6]
+        // 连续子数组=[4, -1, 2, 1]
+        // 最大和=6
 
-        for (int i : nums1) {
-            System.out.println(i);
-        }
-        merge(nums1, m, nums2, n);
+        int sum = maxSubArray(nums);
 
-        System.out.println("===========");
-
-        for (int i : nums1) {
-            System.out.println(i);
-        }
+        System.out.println(sum);
     }
 
 
-    // 提示1：如果从前往后填，nums1 前面的有效元素会被覆盖。那反过来呢？
-    // 提示2：每次比较两个数组的最大值，放到 nums1 的最末尾，指针逐步前移
-    public static void merge(int[] nums1, int m, int[] nums2, int n) {
-        // 解法一：暴力 — 合并后排序（不推荐）
+    public static int maxSubArray(int[] nums) {
+        // 如何界定连续
+        // 需要知道该元素是否有出现过
+        // 如果出现过，则子数组中断，记录该子数组最大和
 
-        // 解法二：逆向双指针
-        // 指针一：指向nums1的有效尾端
-        int p1 = m - 1;
-        // 指针二：指向nums2的有效尾端
-        int p2 = n - 1;
-        // 指针三：指向nums1的尾端
-        int p = nums1.length - 1;
+        // 两个指针，左指针和右指针
+        // 左右指针起点相等
+        // int l = 0;
+        // int r = 0;
 
-        // 从右向左遍历数组
-        // 直到任意一个指针<0退出循环
-        while (p1 >= 0 && p2 >= 0) {
-            // 指针一和指针二比较大小
-            if (nums1[p1] >= nums2[p2]) {
-                // 更大的元素移动到指针三
-                nums1[p] = nums1[p1];
-                // 大元素指针左移
-                p1--;
-            } else {
-                nums1[p] = nums2[p2];
-                p2--;
+        // 一个结构，保存出现过的元素字典
+        Set<Integer> map = new HashSet<>(nums.length);
+
+        // 两个变量，历史最大和，当前和
+        int cSum = 0;
+        int hSum = 0;
+
+        for (int i = 0; i < nums.length; i++) {
+            int r = i;
+            // 一直处理到右指针到底为止
+            while (r < nums.length) {// -2, 1, -3, 4, -1, 2, 1, -5, 4
+                // 右指针往右扫描
+
+                // 右指针指向元素是否出现过
+                if (map.contains(nums[r])) {
+                    // 如果出现过，子数组中断
+
+                    // 如果当前和>历史最大和
+                    if (cSum > hSum) {
+                        // 覆盖历史最大和
+                        hSum = cSum;
+                        // 清除当前和
+                        cSum = 0;
+                    }
+                    // 清除结构
+                    map.clear();
+                    // 左指针移动到右指针
+                    // l = r;
+                } else {
+                    // 如果没出现过
+
+                    // 加到当前和
+                    cSum = cSum + nums[r];
+                    // 保存到结构
+                    map.add(nums[r]);
+                    r++;
+                }
+
+
             }
 
-            // 每次指针三左移
-            p--;
+            hSum = Math.max(cSum, hSum);
+            cSum = 0;
+            map.clear();
+
         }
 
-        // 如果nums2还有剩余，搬过去
-        while (p2 >= 0) {
-            nums1[p] = nums2[p2];
-            p2--;
-            p--;
-        }
-
-        // 如果是nums1还有剩余，不用管，因为已经在原位了，本身就是有序的
-
+        // 返回历史和
+        return hSum;
     }
 }
