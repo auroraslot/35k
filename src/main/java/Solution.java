@@ -1,46 +1,66 @@
+import utils.ArrayUtils;
+
 import java.util.*;
+
+import static utils.ArrayUtils.printArray;
 
 class Solution {
 
     public static void main(String[] args) {
-        // 有一个数组prices，prices[i]代表第i天的股票价格
-        // 你只能选择 某一天 买入这只股票，并选择在 未来的某一个不同的日子 卖出该股票。设计一个算法来计算你所能获取的最大利润。
-        // 返回最大利润，如果不能获取利润则返回 0
+        //给定一个数组 nums，编写一个函数将所有 0 移动到数组的末尾，同时保持非零元素的相对顺序。
+        //
+        //请注意 ，必须在不复制数组的情况下原地对数组进行操作。
+        //
+        //
+        //
+        //示例 1:
+        //
+        //输入: nums = [0,1,0,3,12]
+        //输出: [1,3,12,0,0]
+
+
+        // 有一个数组nums
+        // 将nums中的0移动到末尾，但是不能改变数组中元素的原有位置
         // 例如
-        int[] nums = new int[]{7, 1, 5, 3, 6, 4};
+        int[] nums = new int[]{0, 1, 0, 3, 12}; // [2,1]
         // 结果：
-        // 最大利润=5。  6 - 1
+        // [1,3,12,0,0]
+        printArray(nums);
 
-        int sum = maxProfit(nums);
+        moveZeroes(nums);
 
-        System.out.println(sum);
+        printArray(nums);
     }
 
 
-    //  提示1：如果你已经知道历史最低价，那今天卖出的利润是多少？
-    //  提示2：遍历的时候同时维护两个东西：历史最低价 和 最大利润
-    public static int maxProfit(int[] prices) {
-        // 本质是求最大的差值
+    public static void moveZeroes(int[] nums) {
+        // 0, 1, 0, 3, 12 - s=0;f=1
+        // 1, 0, 0, 3, 12 - s=1;f=2
+        // 1, 0, 0, 3, 12 - s=1;f=3
+        // 1, 3, 0, 0, 12 - s=2;f=4
+        // 1, 3, 12, 0, 0 - s=3;f=5
+        // return
 
-        // 怎么求？
-        // 记录历史最低价
-        int minPrice = Integer.MAX_VALUE;
-        // 记录最大利润
-        int maxProfit = 0;
 
-        // 遍历prices计算
-        for (int i = 0; i < prices.length; i++) {
-            // 不断的维护历史最低价
-            minPrice = Math.min(minPrice, prices[i]);
-            // 不断的计算最大利润
-            maxProfit = Math.max(maxProfit, prices[i] - minPrice);
+        // 双指针
+
+        // 慢指针：指向当前需保留元素位置
+        int s = 0;
+
+        // 快指针：指向扫描位置
+        for (int f = 1; f < nums.length; f++) {
+            // 快指针不为0，慢指针为0
+            if (nums[f] != 0) {
+                int tmp = nums[s]; // [2,1]
+                // 和慢指针替换
+                nums[s] = nums[f];
+                nums[f] = tmp;
+                // 慢指针右移
+                s++;
+            }
+
+
+            // 每次循环快指针都右移，直到底部
         }
-
-
-        // 最后算出来的就是利润最高的
-        return maxProfit;
-
-
-        // 简单解就是暴力穷举
     }
 }
