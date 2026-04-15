@@ -7,44 +7,48 @@ import static utils.ArrayUtils.printArray;
 class Solution {
 
     public static void main(String[] args) {
-        // 有一个数组nums
-        // 返回其中的多数元素。多数元素是指在数组中出现次数 大于 ⌊ n/2 ⌋ 的元素。
-        // 你可以假设数组是非空的，并且给定的数组总是存在多数元素。
-        // 例如
-        int[] nums = new int[]{3, 2, 3};
+        //编写一个函数，其作用是将输入的字符串反转过来。输入字符串以字符数组 s 的形式给出。
+        //
+        //不要给另外的数组分配额外的空间，你必须原地修改输入数组、使用 O(1) 的额外空间解决这一问题。
+        //
+        //
+        //
+        //示例 1：
+        //
+        //输入：s = ["h","e","l","l","o"]
+        //输出：["o","l","l","e","h"]
+
+
+
+        char[] s = new char[]{'h','e','l','l','o'};
         // 结果：
-        // 3
-        int result = majorityElement(nums);
-        System.out.println(result);
+        // ["o","l","l","e","h"]
+        reverseString(s);
+
+        printArray(s);
     }
 
 
-    //  提示1：想象一个场景——一群人互相"对拼消耗"，一个人可以"消灭"一个不同阵营的人，最后活下来的是哪个阵营？
-    //  提示2：只需要两个变量：候选人 和 票数。
-    public static int majorityElement(int[] nums) {
-        // 候选人，票数
-        int c = 0;
-        int t = 0;
-
-        // 不同人参选票数抵消，多票数的候选人最后会留存下来
-        for (int i = 0; i < nums.length; i++) {
-
-            // 如果票数为0，则当前人候选
-            if (t == 0) {
-                c = nums[i];
+    public static void reverseString(char[] s) {
+        // 左右双指针
+        int l = 0;
+        int r = s.length - 1;
+        // 一直到左指针>=右指针
+        while (l < r) {
+            // 左右指针不相等
+            if (s[l] != s[r]) {
+                // 替换
+                char tmp = s[l];
+                s[l] = s[r];
+                s[r] = tmp;
             }
 
-            // 票数抵消
-            if (c == nums[i]) {
-                // 参选人等于候选人，票数+1
-                t++;
-            } else {
-                // 其他参选人，票数-1
-                t--;
-            }
+            l++;
+            r--;
         }
 
-        // 最后获胜的返回
-        return c;
+
+        // 每次循环左指针++ 右指针--
+
     }
 }
