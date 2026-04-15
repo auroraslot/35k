@@ -26,21 +26,22 @@ class Solution {
     }
 
 
+    // 哈希表的定义：哈希表不是特指 HashMap，而是一种思想。通过 key 直接定位到 value，查找时间 O(1)的结构都是哈希表。
     public static boolean isAnagram(String s, String t) {
         if (s.length() != t.length()) {
             return false;
         }
 
-        // 排序后比较
-        char[] sc = s.toCharArray();
-        char[] tc = t.toCharArray();
+        // 额外空间，哈希表
+        int[] map = new int[26];
+        // s+；t-，最后全是0则true，否则false
+        for (int i = 0; i < s.length(); i++) {
+            map[s.charAt(i) - 'a']++;
+            map[t.charAt(i) - 'a']--;
+        }
 
-        Arrays.sort(sc);
-        Arrays.sort(tc);
-
-        for (int i = 0; i < sc.length; i++) {
-            // 遇到不相等的返回false
-            if (sc[i] != tc[i]) {
+        for (int i : map) {
+            if (i != 0) {
                 return false;
             }
         }
