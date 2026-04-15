@@ -7,45 +7,48 @@ import static utils.ArrayUtils.printArray;
 class Solution {
 
     public static void main(String[] args) {
-        //给定两个字符串 s 和 t ，编写一个函数来判断 t 是否是 s 的 字母异位词。
-        //字母异位词是通过重新排列不同单词或短语的字母而形成的单词或短语，并使用所有原字母一次。
+        //编写一个函数来查找字符串数组中的最长公共前缀。
+        //
+        //如果不存在公共前缀，返回空字符串 ""。
         //
         //
-        //示例 1:
         //
-        //输入: s = "anagram", t = "nagaram"
-        //输出: true
+        //示例 1：
+        //
+        //输入：strs = ["flower","flow","flight"]
+        //输出："fl"
 
-
-
-        String s = "anagram";
-        String t = "nagaram";
-        boolean palindrome = isAnagram(s, t);
-
-        System.out.println(palindrome);
+        // String[] strs = new String[]{"flower", "flow", "flight"};
+        String[] strs = new String[]{"ab", "a"};
+        String s = longestCommonPrefix(strs);
+        System.out.println(s);
     }
 
 
-    // 哈希表的定义：哈希表不是特指 HashMap，而是一种思想。通过 key 直接定位到 value，查找时间 O(1)的结构都是哈希表。
-    public static boolean isAnagram(String s, String t) {
-        if (s.length() != t.length()) {
-            return false;
-        }
+    public static String longestCommonPrefix(String[] strs) {
+        // 最长公共前缀
 
-        // 额外空间，哈希表
-        int[] map = new int[26];
-        // s+；t-，最后全是0则true，否则false
-        for (int i = 0; i < s.length(); i++) {
-            map[s.charAt(i) - 'a']++;
-            map[t.charAt(i) - 'a']--;
-        }
+        StringBuilder sb = new StringBuilder();
 
-        for (int i : map) {
-            if (i != 0) {
-                return false;
+        // 遍历字符
+        for (int i = 0; i < strs[0].length(); i++) {
+            // 遍历数组
+            for (int j = 1; j < strs.length; j++) {
+                if (i >= strs[j].length()) {
+                    return sb.toString();
+                }
+
+                // 字符是否不相等
+                if (strs[j].charAt(i) != strs[0].charAt(i)) {
+                    // return公共子串
+                    return sb.toString();
+                }
             }
+
+            // 相等字符记录公共子串
+            sb.append(strs[0].charAt(i));
         }
 
-        return true;
+        return sb.toString();
     }
 }
