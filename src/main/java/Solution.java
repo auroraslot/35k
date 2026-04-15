@@ -7,48 +7,88 @@ import static utils.ArrayUtils.printArray;
 class Solution {
 
     public static void main(String[] args) {
-        //编写一个函数，其作用是将输入的字符串反转过来。输入字符串以字符数组 s 的形式给出。
+        //如果在将所有大写字符转换为小写字符、并移除所有非字母数字字符之后，短语正着读和反着读都一样。则可以认为该短语是一个 回文串 。
         //
-        //不要给另外的数组分配额外的空间，你必须原地修改输入数组、使用 O(1) 的额外空间解决这一问题。
+        //字母和数字都属于字母数字字符。
+        //
+        //给你一个字符串 s，如果它是 回文串 ，返回 true ；否则，返回 false 。
         //
         //
         //
         //示例 1：
         //
-        //输入：s = ["h","e","l","l","o"]
-        //输出：["o","l","l","e","h"]
+        //输入: s = "A man, a plan, a canal: Panama"
+        //输出：true
+        //解释："amanaplanacanalpanama" 是回文串。
 
 
 
-        char[] s = new char[]{'h','e','l','l','o'};
-        // 结果：
-        // ["o","l","l","e","h"]
-        reverseString(s);
+        String s = "A man, a plan, a canal: Panama";
+        // 结果：amanaplanacanalpanama
+        // true
+        boolean palindrome = isPalindrome(s);
 
-        printArray(s);
+        System.out.println(palindrome);
+
     }
 
 
-    public static void reverseString(char[] s) {
+    public static boolean isPalindrome(String s) {
+        // 怎么搞？
         // 左右双指针
         int l = 0;
-        int r = s.length - 1;
+        int r = s.length() - 1;
+        s = s.toLowerCase();
+        char[] cs = s.toCharArray();
+
+        // 前提
+        // 字母数字的边界 - 正则表达式
+        // 大写到小写的差值 - 大写全部转小写
+
         // 一直到左指针>=右指针
         while (l < r) {
-            // 左右指针不相等
-            if (s[l] != s[r]) {
-                // 替换
-                char tmp = s[l];
-                s[l] = s[r];
-                s[r] = tmp;
+            // 左右指针元素不是字母数字
+            char lc = cs[l];
+            if (!isNumberOrChar(lc)) {
+                // 左指针右移
+                l++;
+                continue;
+            }
+            char rc = cs[r];
+            if (!isNumberOrChar(rc)) {
+                // 右指针左移
+                r--;
+                continue;
             }
 
-            l++;
-            r--;
+            // 如果是字母数字
+            // 左右指针比较相等
+            if (lc == rc) {
+                // 左指针右移，右指针左移
+                l++;
+                r--;
+            } else {
+                // 如果不相等
+                return false;
+            }
+            // return false
         }
 
 
-        // 每次循环左指针++ 右指针--
 
+
+        return true;
+    }
+
+    private static boolean isNumberOrChar(char c) {
+        if (c >= '0' && c <= '9') {
+            return true;
+        }
+
+        if (c >= 'a' && c <= 'z') {
+            return true;
+        }
+
+        return false;
     }
 }
