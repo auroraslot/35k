@@ -8,81 +8,45 @@ import static utils.ArrayUtils.printArray;
 class Solution {
 
     public static void main(String[] args) {
-        //给定一个字符串 s ，请你找出其中不含有重复字符的 最长 子串 的长度。
+        //给你一个字符串数组，请你将 字母异位词 组合在一起。可以按任意顺序返回结果列表。
         //
         //
         //
         //示例 1:
         //
-        //输入: s = "abcabcbb"
-        //输出: 3
-        //解释: 因为无重复字符的最长子串是 "abc"，所以其长度为 3。注意 "bca" 和 "cab" 也是正确答案。
+        //输入: strs = ["eat", "tea", "tan", "ate", "nat", "bat"]
+        //
+        //输出: [["bat"],["nat","tan"],["ate","eat","tea"]]
+        //
+        //解释：
+        //
+        //在 strs 中没有字符串可以通过重新排列来形成 "bat"。
+        //字符串 "nat" 和 "tan" 是字母异位词，因为它们可以重新排列以形成彼此。
+        //字符串 "ate" ，"eat" 和 "tea" 是字母异位词，因为它们可以重新排列以形成彼此。
 
-//         String s = "abcabcbb";
-//         String s = "aab";
-//        String s = "dvdf";
-        String s = "ppwppwcww";
-//        String s = "aabaab!bb";
+        String[] strs = new String[] {"eat", "tea", "tan", "ate", "nat", "bat"};
 
-        System.out.println(lengthOfLongestSubstring(s));
+        System.out.println(groupAnagrams(strs));
     }
 
 
-    public static int lengthOfLongestSubstring(String s) {
-        // 无重复字符的最长子串
+    public static List<List<String>> groupAnagrams(String[] strs) {
+        // 先对每个str排序，覆盖保存到数组中；遍历strs，检查str在Map中是否存在，如果存在，将str添加到value；否则put到map
+        // 最后map的values就是结果
 
-        // 滑动窗口
 
-        // 左指针：窗口尾端
-        int l = 0;
-        // 右指针：窗口首端
-//        int r = 0;
-
-        // 哈希表：字符是否出现过
-        Set<Character> map = new HashSet<>();
-
-        // 当前长度
-        int cH = 0;
-        // 最大长度
-        int hH = 0;
-
-        // 右指针扫描
-        char[] charArray = s.toCharArray();
-        for (int r = 0; r < charArray.length; r++) {
-            char c = charArray[r];
-
-            // 字符出现过
-            while (map.contains(c)) {
-                // 更新最大长度
-                hH = Math.max(hH, cH);
-                // 移动过程中的元素从哈希表中移除
-                map.remove(charArray[l]);
-                l++;
-                // 当前长度-
-                cH--;
-
-                // 左指针右移，一直右移到重复字符所在的位置
-//                while (c != charArray[l]) {
-//
-//
-//                }
+        Map<String, List<String>> map = new HashMap<>();
+        for (int i = 0; i < strs.length; i++) {
+            char[] charArray = strs[i].toCharArray();
+            Arrays.sort(charArray);
+            String tmp = new String(charArray);
+            if (map.containsKey(tmp)) {
+                map.get(tmp).add(strs[i]);
+            } else {
+                map.put(tmp, new ArrayList<>(Collections.singletonList(strs[i])));
             }
-
-//            else {
-                // 没有出现过
-                // 更新当前长度
-                cH++;
-                // 添加到哈希表
-                map.add(charArray[r]);
-//            }
-
         }
 
-
-
-        // 返回最大长度
-
-        return Math.max(hH, cH);
-
+        return new ArrayList<>( map.values());
     }
 }
