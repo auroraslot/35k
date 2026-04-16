@@ -31,22 +31,33 @@ class Solution {
 
 
     public static List<List<String>> groupAnagrams(String[] strs) {
-        // 先对每个str排序，覆盖保存到数组中；遍历strs，检查str在Map中是否存在，如果存在，将str添加到value；否则put到map
-        // 最后map的values就是结果
-
+        // 哈希表解法：
+        // 字符一样的保存到同一个List
+        // 如果辨别字符是否一样？哈希表一样说明一样
+        // 怎么知道哈希表一样？数组元素一样
+        // 把数组元素作为字符串去判定
 
         Map<String, List<String>> map = new HashMap<>();
-        for (int i = 0; i < strs.length; i++) {
-            char[] charArray = strs[i].toCharArray();
-            Arrays.sort(charArray);
-            String tmp = new String(charArray);
-            if (map.containsKey(tmp)) {
-                map.get(tmp).add(strs[i]);
-            } else {
-                map.put(tmp, new ArrayList<>(Collections.singletonList(strs[i])));
-            }
-        }
 
-        return new ArrayList<>( map.values());
+        // 遍历strs
+        for (String str : strs) {
+            // 哈希表维护str
+            int[] cs = new int[26];
+            char[] charArray = str.toCharArray();
+            for (char c : charArray) {
+                cs[c - 'a']++;
+            }
+
+            // 按哈希表转为String
+            StringBuilder sb = new StringBuilder();
+            for (int c : cs) {
+                sb.append(c).append("#");
+            }
+
+            // 将该String作为key，保存到map
+            map.computeIfAbsent(sb.toString(), k -> new ArrayList<>()).add(str);
+        }
+        // 最后遍历结束时，map的values就是最后的结果
+        return new ArrayList<>(map.values());
     }
 }
