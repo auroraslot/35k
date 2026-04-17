@@ -14,71 +14,121 @@ class Solution {
     static int start = 0;
 
     public static void main(String[] args) {
-        //给你一个字符串 s，找到 s 中最长的 回文 子串。
-        //回文子串：如果字符串向前和向后读都相同，则它满足 回文性。
+        //给定两个字符串形式的非负整数 num1 和num2 ，计算它们的和并同样以字符串形式返回。
         //
+        //你不能使用任何內建的用于处理大整数的库（比如 BigInteger）， 也不能直接将输入的字符串转换为整数形式。
         //
         //示例 1：
         //
-        //输入：s = "babad"
-        //输出："bab"
-        //解释："aba" 同样是符合题意的答案。
+        //输入：num1 = "11", num2 = "123"
+        //输出："134"
+        //示例 2：
+        //
+        //输入：num1 = "456", num2 = "77"
+        //输出："533"
+        //示例 3：
+        //
+        //输入：num1 = "0", num2 = "0"
+        //输出："0"
 
 
+         String num1 = "11";
+//        String num1 = "1";
+//        String num1 = "456";
+//        String num1 = "9";
+         String num2 = "123";
+//        String num2 = "9";
+//        String num2 = "77";
+//        String num2 = "99";
 
-//        String s = "babad"; // 这个case左右指针直接扫描出来的就是最长的
-        String s = "cbbd"; // 这个case左右指针直接扫描出来的就是最长的
-//        String s = "bacabad"; // 这个case左右指针直接扫描出来的就是最长的
 
-        // "bacabad" // 这种case直接左右指针扫描就扫不到了
-
-        // 向外扫描，逐个元素扫描
-        // 扫描过程中记录最大长度和回文子串
-
-
-        System.out.println(longestPalindrome(s));
+        System.out.println(addStrings(num1, num2));
     }
 
 
-    public static String longestPalindrome(String s) {
-        // 双指针 + 中心扩展 + 逐个元素查找
+    public static String addStrings(String num1, String num2) {
+        // 从右向左遍历字符串
+        char[] cs1 = num1.toCharArray();
+        char[] cs2 = num2.toCharArray();
 
-        // 根据这两个要素可以拿到最长回文串
+        // 不用区分谁长谁短，反正两个指针遍历，其中一个遍历到底，还没到底的哪个再继续搞
 
-        char[] cs = s.toCharArray();
-        for (int i = 0; i < cs.length; i++) {
-            // 奇数回文串
-            extracted(i, i, cs);
-            // 偶数回文串
-            extracted(i, i+1, cs);
+        // 两个指针，指向最右端
+        int p1 = cs1.length - 1;
+        int p2 = cs2.length - 1;
+
+        StringBuilder result = new StringBuilder();
+
+        boolean jw = false;
+        // 记录走到了哪里
+        int idx = 0;
+
+        // 两个都>=0则一直循环
+        while (p1 >=0 && p2 >= 0) {
+            // 从低位相加到长字符串的具体字符
+            char c1 = cs1[p1];
+            char c2 = cs2[p2];
+
+            int n1 = c1 - '0';
+            int n2 = c2 - '0';
+
+            // 2者相加要先转为int
+            int tmp = n1 + n2;
+            if (jw) {
+                tmp += 1;
+                jw = false;
+            }
+
+            if (tmp >= 10) {
+                tmp -= 10;
+                jw = true;
+            }
+
+            // 本次计算结果
+            result.insert(0, (char) (tmp + '0'));
+
+            // 每次循环--
+            p1--;
+            p2--;
         }
 
-        return s.substring(start, start + max);
+        // 有字符还没走完，继续往前计算
+        int p = p1 >= 0 ? p1 : p2;
+        char[] cs = p1 >=0 ? cs1 : cs2;
+        while (p >= 0) {
+            int tmp = cs[p] - '0';
+            // 是否有进位
+            if (jw) {
+                // 字符+1
+                // c = (char) ((c - '0' + 1) + '0');
+                tmp += 1;
+                jw = false;
+            }
 
-        // 奇回文串，从扫描元素 和 扫描元素+1之间扩展
+            if (tmp >= 10) {
+                tmp -= 10;
+                jw = true;
+            }
 
-        // 左指针<0或右指针>length-1扫描结束
-        // 左指针 != 右指针扫描结束
-        // 结束时检查最大长度
+//            result.insert(0, c);
+            result.insert(0, (char) (tmp + '0'));
+            p--;
+        }
 
-        // 否则扫描过程中挪动左右指针
+        // 如果字符都走完了，但是有进位
+        if (jw) {
+            result.insert(0, '1');
+        }
 
-        // 最后按最大长度和起始位置返回字符串
-//        return null;
+        // 相加时，判断进位标识存在
+        // c1 = c1 + c2 + 1;
+
+        // 相加之和>9
+        // 则c1 = c1 + c2 - 10;
+        // 记录进位标识
+
+        return result.toString();
     }
 
-    private static void extracted(int l, int r, char[] cs) {
-        while (l >=0 && r <= cs.length - 1 && cs[l] == cs[r]) {
-            // 这里多挪了一次
-            l--;
-            r++;
-        }
-
-        // 实际长度是[l+1] - [r-1]
-        if (max < r - l - 1) {
-            start = l + 1;
-            max = r - l - 1;
-        }
-    }
 
 }
