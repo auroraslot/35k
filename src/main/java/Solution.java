@@ -1,3 +1,4 @@
+import org.springframework.lang.NonNull;
 import sun.plugin.net.protocol.jar.CachedJarURLConnection;
 import utils.ArrayUtils;
 
@@ -7,57 +8,77 @@ import static utils.ArrayUtils.printArray;
 
 class Solution {
 
+    // 记录最大长度
+    static int max = 0;
+    // 最大长度变化时，记录起始位置
+    static int start = 0;
+
     public static void main(String[] args) {
-        //给你一个字符串数组，请你将 字母异位词 组合在一起。可以按任意顺序返回结果列表。
+        //给你一个字符串 s，找到 s 中最长的 回文 子串。
+        //回文子串：如果字符串向前和向后读都相同，则它满足 回文性。
         //
         //
+        //示例 1：
         //
-        //示例 1:
-        //
-        //输入: strs = ["eat", "tea", "tan", "ate", "nat", "bat"]
-        //
-        //输出: [["bat"],["nat","tan"],["ate","eat","tea"]]
-        //
-        //解释：
-        //
-        //在 strs 中没有字符串可以通过重新排列来形成 "bat"。
-        //字符串 "nat" 和 "tan" 是字母异位词，因为它们可以重新排列以形成彼此。
-        //字符串 "ate" ，"eat" 和 "tea" 是字母异位词，因为它们可以重新排列以形成彼此。
+        //输入：s = "babad"
+        //输出："bab"
+        //解释："aba" 同样是符合题意的答案。
 
-        String[] strs = new String[] {"eat", "tea", "tan", "ate", "nat", "bat"};
 
-        System.out.println(groupAnagrams(strs));
+
+//        String s = "babad"; // 这个case左右指针直接扫描出来的就是最长的
+        String s = "cbbd"; // 这个case左右指针直接扫描出来的就是最长的
+//        String s = "bacabad"; // 这个case左右指针直接扫描出来的就是最长的
+
+        // "bacabad" // 这种case直接左右指针扫描就扫不到了
+
+        // 向外扫描，逐个元素扫描
+        // 扫描过程中记录最大长度和回文子串
+
+
+        System.out.println(longestPalindrome(s));
     }
 
 
-    public static List<List<String>> groupAnagrams(String[] strs) {
-        // 哈希表解法：
-        // 字符一样的保存到同一个List
-        // 如果辨别字符是否一样？哈希表一样说明一样
-        // 怎么知道哈希表一样？数组元素一样
-        // 把数组元素作为字符串去判定
+    public static String longestPalindrome(String s) {
+        // 双指针 + 中心扩展 + 逐个元素查找
 
-        Map<String, List<String>> map = new HashMap<>();
+        // 根据这两个要素可以拿到最长回文串
 
-        // 遍历strs
-        for (String str : strs) {
-            // 哈希表维护str
-            int[] cs = new int[26];
-            char[] charArray = str.toCharArray();
-            for (char c : charArray) {
-                cs[c - 'a']++;
-            }
-
-            // 按哈希表转为String
-            StringBuilder sb = new StringBuilder();
-            for (int c : cs) {
-                sb.append(c).append("#");
-            }
-
-            // 将该String作为key，保存到map
-            map.computeIfAbsent(sb.toString(), k -> new ArrayList<>()).add(str);
+        char[] cs = s.toCharArray();
+        for (int i = 0; i < cs.length; i++) {
+            // 奇数回文串
+            extracted(i, i, cs);
+            // 偶数回文串
+            extracted(i, i+1, cs);
         }
-        // 最后遍历结束时，map的values就是最后的结果
-        return new ArrayList<>(map.values());
+
+        return s.substring(start, start + max);
+
+        // 奇回文串，从扫描元素 和 扫描元素+1之间扩展
+
+        // 左指针<0或右指针>length-1扫描结束
+        // 左指针 != 右指针扫描结束
+        // 结束时检查最大长度
+
+        // 否则扫描过程中挪动左右指针
+
+        // 最后按最大长度和起始位置返回字符串
+//        return null;
     }
+
+    private static void extracted(int l, int r, char[] cs) {
+        while (l >=0 && r <= cs.length - 1 && cs[l] == cs[r]) {
+            // 这里多挪了一次
+            l--;
+            r++;
+        }
+
+        // 实际长度是[l+1] - [r-1]
+        if (max < r - l - 1) {
+            start = l + 1;
+            max = r - l - 1;
+        }
+    }
+
 }
