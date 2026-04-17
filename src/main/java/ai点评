@@ -1,119 +1,111 @@
-你的解法完全正确，思路非常清晰。而且你找到了这类题最核心的技巧：用排序后的字符串当 key。
+你的代码 vs 简化版
 
-  题意理解                                                                                                                                                                                                                                          
-   
-  把字符串数组中属于同一组异位词的放在一起。                                                                                                                                                                                                        
-                                                                                                                                                                                                                                                  
-  输入：["eat", "tea", "tan", "ate", "nat", "bat"]
-  输出：[["bat"], ["nat", "tan"], ["ate", "eat", "tea"]]
-
-  核心思路（你已经想到了）
-
-  同一组异位词 → 排序后都一样 → 可以当 Map 的 key
-
-  "eat" → 排序 → "aet"
-  "tea" → 排序 → "aet"  ← 同一组
-  "ate" → 排序 → "aet"  ← 同一组
-
-  "tan" → 排序 → "ant"
-  "nat" → 排序 → "ant"  ← 同一组
-
-  Map:
-    "aet" → ["eat", "tea", "ate"]
-    "ant" → ["tan", "nat"]
-    "abt" → ["bat"]
-
-  优化你的代码
-
-  你的代码可以用 computeIfAbsent 或 getOrDefault 简化：
+  核心改动：把两个 while 合并成一个，指针越界时当作 0 处理。
 
   class Solution {
-      public List<List<String>> groupAnagrams(String[] strs) {
-          Map<String, List<String>> map = new HashMap<>();
+      public String addStrings(String num1, String num2) {
+          int p1 = num1.length() - 1;
+          int p2 = num2.length() - 1;
+          int carry = 0; // 进位（用 int 代替 boolean，直接参与计算）
+          StringBuilder result = new StringBuilder();
 
-          for (String str : strs) {
-              char[] chars = str.toCharArray();
-              Arrays.sort(chars);
-              String key = new String(chars);
+          // 只要还有数字没处理完，或者还有进位
+          while (p1 >= 0 || p2 >= 0 || carry > 0) {
+              int n1 = p1 >= 0 ? num1.charAt(p1) - '0' : 0; // 越界当0
+              int n2 = p2 >= 0 ? num2.charAt(p2) - '0' : 0; // 越界当0
 
-              // 如果 key 不存在则创建空 list，然后直接 add
-              map.computeIfAbsent(key, k -> new ArrayList<>()).add(str);
+              int sum = n1 + n2 + carry;
+              carry = sum / 10;           // 进位：10以上就是1
+              result.append(sum % 10);    // 个位数字
+
+              p1--;
+              p2--;
           }
 
-          return new ArrayList<>(map.values());
+          return result.reverse().toString();
       }
   }
 
-  computeIfAbsent(key, k -> new ArrayList<>()) 的作用是：
-  - key 存在 → 返回对应的 list
-  - key 不存在 → 执行 lambda 创建一个新 list 并 put，然后返回它
+  对比
+  ┌──────────┬────────────────────────────────┬─────────────────────────────────┐
+  │          │            你的写法            │             简化版              │
+  ├──────────┼────────────────────────────────┼─────────────────────────────────┤
+  │ 循环数量 │ 3 个（公共 + 剩余 + 进位判断） │ 1 个                            │
+  ├──────────┼────────────────────────────────┼─────────────────────────────────┤
+  │ 进位处理 │ boolean jw + 手动加减          │ int carry + 除法取余            │
+  ├──────────┼────────────────────────────────┼─────────────────────────────────┤
+  │ 插入方向 │ insert(0, ...) 每次头插 O(n)   │ append 尾插 O(1) + 最后 reverse │
+  ├──────────┼────────────────────────────────┼─────────────────────────────────┤
+  │ 总代码行 │ ~50 行                         │ ~15 行                          │
+  └──────────┴────────────────────────────────┴─────────────────────────────────┘
+  三个简化技巧
 
-  一行替代了你的 if-else。
+  技巧1：用 || 合并循环，越界当 0
 
-  复杂度：时间 O(n × k log k)（n 个字符串，每个长度 k 排序），空间 O(n × k)
+  // 你的写法：两个 while + 额外处理剩余
+  while (p1 >= 0 && p2 >= 0) { ... }
+  while (p >= 0) { ... }
+  if (jw) { ... }
 
-  解法二：计数法做 key
-
-  回忆一下 242 题 的计数法——把字符计数当作 key：
-
-  class Solution {
-      public List<List<String>> groupAnagrams(String[] strs) {
-          Map<String, List<String>> map = new HashMap<>();
-
-          for (String str : strs) {
-              int[] count = new int[26];
-              for (char c : str.toCharArray()) {
-                  count[c - 'a']++;
-              }
-
-              // 把计数数组转成字符串当 key，比如 "1#0#0#...#2#"
-              StringBuilder sb = new StringBuilder();
-              for (int i = 0; i < 26; i++) {
-                  sb.append(count[i]).append('#');
-              }
-              String key = sb.toString();
-
-              map.computeIfAbsent(key, k -> new ArrayList<>()).add(str);
-          }
-
-          return new ArrayList<>(map.values());
-      }
+  // 简化：一个 while 搞定
+  while (p1 >= 0 || p2 >= 0 || carry > 0) {
+      int n1 = p1 >= 0 ? num1.charAt(p1) - '0' : 0;
+      ...
   }
 
-  "eat" → count = [1,0,0,0,1,...,1,0,...] → "1#0#0#0#1#..."
-  "tea" → count = [1,0,0,0,1,...,1,0,...] → "1#0#0#0#1#..."  ← 相同
+  技巧2：进位用 int 代替 boolean
 
-  复杂度：时间 O(n × k)，空间 O(n × k)
+  // 你的写法
+  if (jw) { tmp += 1; jw = false; }
+  if (tmp >= 10) { tmp -= 10; jw = true; }
 
-  注意 # 分隔符是必须的。不加的话 count=[1,12,0,...] 和 count=[11,2,0,...] 会得到相同的字符串 "1120..."。
+  // 简化：整数除法和取余天然处理进位
+  int sum = n1 + n2 + carry;
+  carry = sum / 10;    // 9+9+1=19 → carry=1
+  int digit = sum % 10; // 19 → digit=9
 
-  两种解法对比
-  ┌────────┬────────────────┬──────────────────────┐
-  │        │ 排序法（你的） │        计数法        │
-  ├────────┼────────────────┼──────────────────────┤
-  │ 时间   │ O(n × k log k) │ O(n × k)             │
-  ├────────┼────────────────┼──────────────────────┤
-  │ 代码量 │ 少             │ 稍多                 │
-  ├────────┼────────────────┼──────────────────────┤
-  │ 通用性 │ 适用任何字符   │ 只适合字母表小的场景 │
-  ├────────┼────────────────┼──────────────────────┤
-  │ 面试中 │ 先给这个       │ 作为优化方案         │
-  └────────┴────────────────┴──────────────────────┘
-  这道题的收获
+  技巧3：先 append 后 reverse
 
-  Map 的 key 可以是"特征"，不一定是原始字符串。
+  // 你的写法：每次插入到头部，O(n) 复杂度
+  result.insert(0, c);   // 每次插入都要搬移所有已有字符
 
-  - 异位词的特征 → 排序后的字符串 / 字母计数
-  - 相似数字的特征 → 各位数字之和
-  - 相似坐标的特征 → 归一化后的坐标
+  // 简化：追加到尾部 O(1)，最后翻转一次
+  result.append(digit);
+  return result.reverse().toString();
 
-  这个思路在很多"分组"类题目中都适用，比如：
-  ┌────────────────────────────┬─────────────────┐
-  │            题目            │    分组特征     │
-  ├────────────────────────────┼─────────────────┤
-  │ 49. 字母异位词分组（本题） │ 排序后的字符串  │
-  ├────────────────────────────┼─────────────────┤
-  │ 128. 最长连续序列          │ 连续数字的起点  │
-  ├────────────────────────────┼─────────────────┤
-  │ 594. 最长和谐子序列        │ 相差为 1 的数对 │
-  └────────────────────────────┴─────────────────┘
+
+
+
+carry = sum / 10;  为什么要这一步？我理解carry只有1和0，最大也只有1
+
+⏺ 你的理解是对的，在这道题里 carry 确实只有 0 和 1。
+
+  因为单位数最大是 9，最大情况：9 + 9 + 1 = 19，所以 19 / 10 = 1。
+
+  但用 sum / 10 而不是 if (sum >= 10) carry = 1 有两个原因：
+
+  1. 代码更简洁
+
+  // if-else 写法（你的思路）
+  if (sum >= 10) {
+      sum -= 10;
+      carry = 1;
+  } else {
+      carry = 0;
+  }
+
+  // 除法取余写法（一行搞定上面的逻辑）
+  carry = sum / 10;   // 19→1, 8→0
+  digit = sum % 10;   // 19→9, 8→8
+
+  两者在本题中结果完全一样，只是写法更精简。
+
+  2. 换一道题就不止 0 和 1 了
+
+  43. 字符串相乘中，会出现单位相乘的结果：
+
+  9 × 9 = 81 → carry = 81 / 10 = 8
+
+  这时候 carry 可以是 0-8，if (sum >= 10) 就不够用了，而 sum / 10 依然通用。
+
+  所以这是一个通用写法，养成习惯后不用针对每道题单独判断 carry 的范围。
